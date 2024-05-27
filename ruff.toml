@@ -1,0 +1,18 @@
+line-length = 88
+indent-width = 4
+
+target-version = "py311"
+src = ["app", "tests"]
+
+[lint]
+select = ["I", "F", "UP", "T20", "E", "Q", "PGH"]
+ignore = ["F403"]
+
+fixable = ["ALL"]
+unfixable = []
+
+[format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
