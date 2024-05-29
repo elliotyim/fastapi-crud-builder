@@ -1,14 +1,13 @@
 import abc
 from typing import Generic, TypeVar
 
-from pydantic import BaseModel
-
 from app.domain.entity import Base
+from app.domain.schema.base import CreateSchema, UpdateSchema
 
 K = TypeVar("K", bound=int | str)  # ID Key
 T = TypeVar("T", bound=Base)  # Entity Type
-C = TypeVar("C", bound=BaseModel)  # Create Schema
-U = TypeVar("U", bound=BaseModel)  # Update Schema
+C = TypeVar("C", bound=CreateSchema)  # Create Schema
+U = TypeVar("U", bound=UpdateSchema)  # Update Schema
 
 
 class CRUDRepositoryPort(abc.ABC, Generic[K, T, C, U]):

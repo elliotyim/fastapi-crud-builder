@@ -3,11 +3,12 @@ from sqlalchemy.orm import Session
 
 from app.adapter.outbound.crud import GenericCRUDRepositoryAdapter
 from app.domain.entity import Base
-from app.port.outbound.repository.base import C, CRUDRepositoryPort, K, T, U
+from app.domain.schema.base import CreateSchema, UpdateSchema
+from app.port.outbound.repository.base import CRUDRepositoryPort, K, T
 
 
 class CRUDService:
-    def __init__(self, entity: Base, crud_repository: CRUDRepositoryPort):
+    def __init__(self, entity: type[Base], crud_repository: CRUDRepositoryPort):
         self._entity = entity
         self._crud_repository = crud_repository
 
@@ -17,19 +18,19 @@ class CRUDService:
             raise NoResultFound()
         return instance
 
-    def create(self, create_schema: C) -> T:
+    def create(self, create_schema: CreateSchema) -> T:
         instance = self._crud_repository.create(create_schema)
         self._crud_repository.add(instance)
         self._crud_repository.commit()
         return instance
 
-    def put(self, pk: K, update_schema: U) -> T:
+    def put(self, pk: K, update_schema: UpdateSchema) -> T:
         instance = self.retrieve(pk)
         self._crud_repository.update_all(instance, update_schema)
         self._crud_repository.commit()
         return instance
 
-    def patch(self, pk: K, update_schema: U) -> T:
+    def patch(self, pk: K, update_schema: UpdateSchema) -> T:
         instance = self.retrieve(pk)
         self._crud_repository.update(instance, update_schema)
         self._crud_repository.commit()
@@ -42,20 +43,24 @@ class CRUDService:
 
 
 class CRUDServiceBuilder:
-    entity: Base
+    entity: type[Base]
     session: Session
-    create_schema: C
-    update_schema: U
+    create_schema: type[CreateSchema]
+    update_schema: type[UpdateSchema]
 
-    def set_entity(self, entity: Base) -> "CRUDServiceBuilder":
+    def set_entity(self, entity: type[Base]) -> "CRUDServiceBuilder":
         self.entity = entity
         return self
 
-    def set_create_schema(self, create_schema: C) -> "CRUDServiceBuilder":
+    def set_create_schema(
+        self, create_schema: type[CreateSchema]
+    ) -> "CRUDServiceBuilder":
         self.create_schema = create_schema
         return self
 
-    def set_update_schema(self, update_schema: U) -> "CRUDServiceBuilder":
+    def set_update_schema(
+        self, update_schema: type[UpdateSchema]
+    ) -> "CRUDServiceBuilder":
         self.update_schema = update_schema
         return self
 

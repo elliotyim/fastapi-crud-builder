@@ -1,20 +1,28 @@
-from sqlalchemy import select
+from sqlalchemy import inspect, select
 from sqlalchemy.orm import Session
 
 from app.domain.entity import Base
+from app.domain.schema.base import CreateSchema, UpdateSchema
 from app.port.outbound.repository.base import C, CRUDRepositoryPort, K, T, U
 
 
 class GenericCRUDRepositoryAdapter(CRUDRepositoryPort[K, T, C, U]):
-    def __init__(self, db: Session, entity: Base, create_schema: C, update_schema: U):
+    def __init__(
+        self,
+        db: Session,
+        entity: type[Base],
+        create_schema: type[CreateSchema],
+        update_schema: type[UpdateSchema],
+    ):
         self._db = db
         self._entity = entity
         self._create_schema = create_schema
         self._update_schema = update_schema
 
     def find_by_id(self, id_key: K) -> T:
+        id_field = inspect(self._entity).primary_key[0].name
         return self._db.execute(
-            select(self._entity).where(self._entity.id == id_key)
+            select(self._entity).where(getattr(self._entity, id_field) == id_key)
         ).scalar()
 
     def create(self, create_schema: C) -> T:

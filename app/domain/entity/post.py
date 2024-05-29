@@ -1,5 +1,5 @@
-from sqlalchemy import BigInteger, Column, Integer, String, Text
-from sqlalchemy.orm import Mapped, relationship
+from sqlalchemy import BigInteger, Column, ForeignKey, Integer, String, Text
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.domain.entity import Base
 
@@ -12,6 +12,7 @@ class Post(Base):
         primary_key=True,
         autoincrement=True,
     )
+    author_id: Mapped[str] = mapped_column(ForeignKey("user.id"))
     title: Mapped[str] = Column(String(100), index=True, nullable=False)
     content: Mapped[str] = Column(Text, nullable=True)
 
