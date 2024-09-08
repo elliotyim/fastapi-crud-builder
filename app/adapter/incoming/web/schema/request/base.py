@@ -27,6 +27,13 @@ class RequestList(BaseModel):
             '<p>ex) [<code>"name::desc"</code>, <code>"author.name::asc"</code>]</p>',
         ),
     ):
+        if page < 1:
+            raise ValueError("page must be positive number.")
+        elif page < 1:
+            raise ValueError("page must be positive number.")
+        elif page > 100:
+            page = 20
+
         return cls(
             page=page,
             per_page=per_page,

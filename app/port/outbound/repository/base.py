@@ -6,7 +6,6 @@ from app.domain.schema.base import (
     K,
     OrderBy,
     PaginatedList,
-    Pagination,
     T,
     U,
     Where,
@@ -19,7 +18,8 @@ class CRUDRepositoryPort(abc.ABC, Generic[K, T, C, U]):
         self,
         where: list[Where] | None = None,
         order_by: list[OrderBy] | None = None,
-        pagination: Pagination | None = None,
+        page: int = 1,
+        per_page: int = 20,
         eager_loading_fields: list[str] = None,
         **kwargs,
     ) -> PaginatedList:
@@ -29,7 +29,8 @@ class CRUDRepositoryPort(abc.ABC, Generic[K, T, C, U]):
         Args:
              where (list[Where] | None): Filtering conditions
              order_by (list[OrderBy] | None): Sorting conditions
-             pagination (Pagination | None): Pagination
+             page (int): Page (1-index)
+             per_page (int): Per page
              eager_loading_fields (list[str]): Fields need to be joinedloaded
 
         Returns:

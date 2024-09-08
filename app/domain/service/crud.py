@@ -8,7 +8,6 @@ from app.domain.schema.base import (
     K,
     OrderBy,
     PaginatedList,
-    Pagination,
     T,
     UpdateSchema,
     Where,
@@ -31,7 +30,8 @@ class CRUDService:
         self,
         filter_conditions: list[str] | None = None,
         sort_conditions: list[str] | None = None,
-        pagination: Pagination | None = None,
+        page: int = 1,
+        per_page: int = 20,
         eager_loading_fields: list[str] = None,
         **kwargs,
     ) -> PaginatedList:
@@ -48,8 +48,10 @@ class CRUDService:
         result = self._crud_repository.find_all(
             where=where,
             order_by=order_by,
-            pagination=pagination,
+            page=page,
+            per_page=per_page,
             eager_loading_fields=eager_loading_fields,
+            **kwargs,
         )
         return result
 

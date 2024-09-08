@@ -10,7 +10,6 @@ from app.domain.schema.base import (
     K,
     OrderBy,
     PaginatedList,
-    Pagination,
     T,
     U,
     UpdateSchema,
@@ -120,6 +119,8 @@ class GenericCRUDRepositoryAdapter(CRUDRepositoryPort[K, T, C, U]):
         prev_page = page - 1 if page > 1 else None
         next_page = page + 1 if total_page > page else None
 
+        query = query.limit(per_page).offset((page - 1) * per_page)
+
         entities = self._db.execute(query).unique().scalars().all()
         result = PaginatedList(
             items=entities,
@@ -134,13 +135,13 @@ class GenericCRUDRepositoryAdapter(CRUDRepositoryPort[K, T, C, U]):
         self,
         where: list[Where] | None = None,
         order_by: list[OrderBy] | None = None,
-        pagination: Pagination | None = None,
+        page: int = 1,
+        per_page: int = 20,
         eager_loading_fields: list[str] = None,
         **kwargs,
     ) -> PaginatedList:
         where = [] if where is None else where
         order_by = [] if order_by is None else order_by
-        pagination = Pagination() if pagination is None else pagination
         eager_loading_fields = (
             [] if eager_loading_fields is None else eager_loading_fields
         )
@@ -150,9 +151,7 @@ class GenericCRUDRepositoryAdapter(CRUDRepositoryPort[K, T, C, U]):
         query = self._sort(query, order_by)
         query = self._eager_load(query, eager_loading_fields)
 
-        result = self._execute(
-            query=query, page=pagination.page, per_page=pagination.per_page
-        )
+        result = self._execute(query=query, page=page, per_page=per_page)
         return result
 
     def find_by_id(self, id_key: K) -> T:
