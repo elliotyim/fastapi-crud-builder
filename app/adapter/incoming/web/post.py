@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, Path
-from starlette.responses import JSONResponse, Response
+from starlette.responses import Response
 
 from app.adapter.incoming.web.schema.request.base import RequestList
 from app.adapter.incoming.web.schema.request.post import (
@@ -88,9 +88,7 @@ def put_post(
     If any field of body set null, it will be changed as null.
     """
     post = crud_service.put(pk=post_id, update_schema=PostUpdate.from_orm(body))
-    return JSONResponse(
-        content=ResponsePost.model_validate(post).model_dump(mode="json")
-    )
+    return ResponsePost.model_validate(post)
 
 
 @router.delete("/{post_id}", status_code=204, response_model=None)
