@@ -136,6 +136,7 @@ class GenericCRUDRepositoryAdapter(CRUDRepositoryPort[K, T, C, U]):
         order_by: list[OrderBy] | None = None,
         pagination: Pagination | None = None,
         eager_loading_fields: list[str] = None,
+        **kwargs,
     ) -> PaginatedList:
         where = [] if where is None else where
         order_by = [] if order_by is None else order_by
