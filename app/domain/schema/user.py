@@ -16,4 +16,4 @@ class UserCreate(CreateSchema):
 
 
 class UserUpdate(UpdateSchema):
-    name: str | None
+    name: str | None = None

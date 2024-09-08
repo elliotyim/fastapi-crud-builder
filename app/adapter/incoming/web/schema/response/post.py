@@ -7,7 +7,7 @@ from app.adapter.incoming.web.schema.response.user import ResponseUser
 class ResponsePost(BaseModel):
     id: int
     title: str
-    content: str
+    content: str | None = None
 
     author: ResponseUser
 

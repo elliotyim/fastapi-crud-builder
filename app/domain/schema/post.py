@@ -7,7 +7,7 @@ from app.domain.schema.user import User
 class Post(BaseModel):
     id: int
     title: str
-    content: str | None
+    content: str | None = None
 
     author: User
 
@@ -22,5 +22,5 @@ class PostCreate(CreateSchema):
 
 
 class PostUpdate(UpdateSchema):
-    title: str | None
-    content: str | None
+    title: str | None = None
+    content: str | None = None
