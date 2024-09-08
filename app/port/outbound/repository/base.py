@@ -1,16 +1,42 @@
 import abc
-from typing import Generic, TypeVar
+from typing import Generic
 
-from app.domain.entity import Base
-from app.domain.schema.base import CreateSchema, UpdateSchema
-
-K = TypeVar("K", bound=int | str)  # ID Key
-T = TypeVar("T", bound=Base)  # Entity Type
-C = TypeVar("C", bound=CreateSchema)  # Create Schema
-U = TypeVar("U", bound=UpdateSchema)  # Update Schema
+from app.domain.schema.base import (
+    C,
+    K,
+    OrderBy,
+    PaginatedList,
+    Pagination,
+    T,
+    U,
+    Where,
+)
 
 
 class CRUDRepositoryPort(abc.ABC, Generic[K, T, C, U]):
+    @abc.abstractmethod
+    def find_all(
+        self,
+        where: list[Where] | None = None,
+        order_by: list[OrderBy] | None = None,
+        pagination: Pagination | None = None,
+        eager_loading_fields: list[str] = None,
+        **kwargs,
+    ) -> PaginatedList:
+        """
+        Get all entities by some conditions
+
+        Args:
+             where (list[Where] | None): Filtering conditions
+             order_by (list[OrderBy] | None): Sorting conditions
+             pagination (Pagination | None): Pagination
+             eager_loading_fields (list[str]): Fields need to be joinedloaded
+
+        Returns:
+            PaginatedList: Entities with pagination info.
+        """
+        pass
+
     @abc.abstractmethod
     def find_by_id(self, id_key: K) -> T:
         """

@@ -17,7 +17,7 @@ DB_PATH = os.path.join(ROOT_PATH, "db.sqlite3")
 SQLALCHEMY_DATABASE_URL = f"sqlite:///{DB_PATH}"
 
 _engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
+    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}, echo=True
 )
 
 _Session = get_session_maker(_engine)
@@ -67,8 +67,13 @@ def dummy_users(test_db: Session) -> list[User]:
 @pytest.fixture
 def dummy_posts(test_db: Session, dummy_users: list[User]) -> list[Post]:
     posts = [
-        Post(author=user, title=f"dummy_title_{i}", content=f"dummy_content_{i}")
-        for i, user in enumerate(dummy_users)
+        *(
+            Post(author=user, title=f"dummy_title_{i}", content=f"dummy_content_{i}")
+            for i, user in enumerate(dummy_users)
+        ),
+        Post(author=dummy_users[2], title="dummy_title_4", content="dummy_content_4"),
+        Post(author=dummy_users[0], title="dummy_title_5", content="dummy_content_5"),
+        Post(author=dummy_users[1], title="dummy_title_6", content="dummy_content_6"),
     ]
     test_db.add_all(posts)
     test_db.commit()

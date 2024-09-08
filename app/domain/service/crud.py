@@ -3,8 +3,17 @@ from sqlalchemy.orm import Session
 
 from app.adapter.outbound.crud import GenericCRUDRepositoryAdapter
 from app.domain.entity import Base
-from app.domain.schema.base import CreateSchema, UpdateSchema
-from app.port.outbound.repository.base import CRUDRepositoryPort, K, T
+from app.domain.schema.base import (
+    CreateSchema,
+    K,
+    OrderBy,
+    PaginatedList,
+    Pagination,
+    T,
+    UpdateSchema,
+    Where,
+)
+from app.port.outbound.repository.base import CRUDRepositoryPort
 
 
 class CRUDService:
@@ -17,6 +26,32 @@ class CRUDService:
         if not instance:
             raise NoResultFound()
         return instance
+
+    def retrieve_all(
+        self,
+        filter_conditions: list[str] | None = None,
+        sort_conditions: list[str] | None = None,
+        pagination: Pagination | None = None,
+        eager_loading_fields: list[str] = None,
+        **kwargs,
+    ) -> PaginatedList:
+        where = []
+        for f in filter_conditions:
+            value = f.split("::")
+            where.append(Where(field=value[0], operator=value[1], value=value[2]))
+
+        order_by = []
+        for s in sort_conditions:
+            value = s.split("::")
+            order_by.append(OrderBy(field=value[0], order=value[1]))
+
+        result = self._crud_repository.find_all(
+            where=where,
+            order_by=order_by,
+            pagination=pagination,
+            eager_loading_fields=eager_loading_fields,
+        )
+        return result
 
     def create(self, create_schema: CreateSchema) -> T:
         instance = self._crud_repository.create(create_schema)

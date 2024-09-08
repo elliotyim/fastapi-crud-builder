@@ -1,12 +1,14 @@
 from fastapi import APIRouter, Depends, Path
 from starlette.responses import JSONResponse
 
+from app.adapter.incoming.web.schema.request.base import RequestList
 from app.adapter.incoming.web.schema.request.post import (
     RequestPostCreate,
     RequestPostUpdate,
 )
 from app.dependency.crud import crud_service_factory
 from app.domain import entity
+from app.domain.schema.base import PaginatedList
 from app.domain.schema.post import Post, PostCreate, PostUpdate
 from app.domain.service.crud import CRUDService
 
@@ -29,9 +31,22 @@ def create_post(
     )
 
 
-@router.get("/{id}", response_model=Post)
+@router.get("", response_model=PaginatedList)
+def get_posts(
+    request_param: RequestList = Depends(RequestList.as_param),
+    crud_service: CRUDService = Depends(
+        crud_service_factory(entity.Post, PostCreate, PostUpdate)
+    ),
+):
+    result = crud_service.retrieve_all(
+        eager_loading_fields=["author"], **request_param.dict()
+    )
+    return result
+
+
+@router.get("/{post_id}", response_model=Post)
 def get_post(
-    id: int = Path(..., description="Post ID"),
+    post_id: int = Path(..., description="Post ID"),
     crud_service: CRUDService = Depends(
         crud_service_factory(entity.Post, PostCreate, PostUpdate)
     ),
@@ -39,14 +54,14 @@ def get_post(
     """
     Get a post.
     """
-    post = crud_service.retrieve(id)
+    post = crud_service.retrieve(post_id)
     return JSONResponse(content=Post.model_validate(post).model_dump(mode="json"))
 
 
-@router.patch("/{id}", response_model=Post)
+@router.patch("/{post_id}", response_model=Post)
 def patch_post(
     body: RequestPostUpdate,
-    id: int = Path(..., description="Post ID"),
+    post_id: int = Path(..., description="Post ID"),
     crud_service: CRUDService = Depends(
         crud_service_factory(entity.Post, PostCreate, PostUpdate)
     ),
@@ -55,14 +70,14 @@ def patch_post(
     Update a post partially.\n
     Any null field of body won't be changed.
     """
-    post = crud_service.patch(pk=id, update_schema=PostUpdate.from_orm(body))
+    post = crud_service.patch(pk=post_id, update_schema=PostUpdate.from_orm(body))
     return JSONResponse(content=Post.model_validate(post).model_dump(mode="json"))
 
 
-@router.put("/{id}", response_model=Post)
+@router.put("/{post_id}", response_model=Post)
 def put_post(
     body: RequestPostUpdate,
-    id: int = Path(..., description="Post ID"),
+    post_id: int = Path(..., description="Post ID"),
     crud_service: CRUDService = Depends(
         crud_service_factory(entity.Post, PostCreate, PostUpdate)
     ),
@@ -71,13 +86,13 @@ def put_post(
     Update a post.\n
     If any field of body set null, it will be changed as null.
     """
-    post = crud_service.put(pk=id, update_schema=PostUpdate.from_orm(body))
+    post = crud_service.put(pk=post_id, update_schema=PostUpdate.from_orm(body))
     return JSONResponse(content=Post.model_validate(post).model_dump(mode="json"))
 
 
-@router.delete("/{id}")
+@router.delete("/{post_id}")
 def delete_post(
-    id: int = Path(..., description="Post ID"),
+    post_id: int = Path(..., description="Post ID"),
     crud_service: CRUDService = Depends(
         crud_service_factory(entity.Post, PostCreate, PostUpdate)
     ),
@@ -85,5 +100,5 @@ def delete_post(
     """
     Delete a post.
     """
-    crud_service.delete(pk=id)
+    crud_service.delete(pk=post_id)
     return JSONResponse(status_code=204, content=None)
