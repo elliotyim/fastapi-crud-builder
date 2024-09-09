@@ -1,18 +1,4 @@
-from pydantic import BaseModel
-
 from app.domain.schema.base import CreateSchema, UpdateSchema
-from app.domain.schema.user import User
-
-
-class Post(BaseModel):
-    id: int
-    title: str
-    content: str | None = None
-
-    author: User
-
-    class Config:
-        from_attributes = True
 
 
 class PostCreate(CreateSchema):
@@ -23,4 +9,14 @@ class PostCreate(CreateSchema):
 
 class PostUpdate(UpdateSchema):
     title: str | None = None
+    content: str | None = None
+
+
+class PostCommentCreate(CreateSchema):
+    author_id: str
+    post_id: int
+    content: str
+
+
+class PostCommentUpdate(UpdateSchema):
     content: str | None = None

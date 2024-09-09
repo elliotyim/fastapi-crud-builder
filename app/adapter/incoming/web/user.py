@@ -22,10 +22,7 @@ def create_user(
         crud_service_factory(entity.User, UserCreate, UserUpdate)
     ),
 ):
-    """
-    Create a user.
-    """
-    user = crud_service.create(UserCreate.from_orm(body))
+    user = crud_service.create(UserCreate(**body.dict()))
     return ResponseUser.model_validate(user)
 
 
@@ -36,28 +33,22 @@ def get_users(
         crud_service_factory(entity.User, UserCreate, UserUpdate)
     ),
 ):
-    """
-    Get users.
-    """
     result = crud_service.retrieve_all(**request_param.dict())
     return ResponseUserList.model_validate(result)
 
 
-@router.get("/{user_id}", status_code=200, response_model=ResponseUser)
+@router.get("/{user_id}", response_model=ResponseUser)
 def get_user(
     user_id: str = Path(..., description="User ID"),
     crud_service: CRUDService = Depends(
         crud_service_factory(entity.User, UserCreate, UserUpdate)
     ),
 ):
-    """
-    Get a user.
-    """
     user = crud_service.retrieve(user_id)
     return ResponseUser.model_validate(user)
 
 
-@router.patch("/{user_id}", status_code=200, response_model=ResponseUser)
+@router.patch("/{user_id}", response_model=ResponseUser)
 def patch_user(
     body: RequestUserUpdate,
     user_id: str = Path(..., description="User ID"),
@@ -65,15 +56,11 @@ def patch_user(
         crud_service_factory(entity.User, UserCreate, UserUpdate)
     ),
 ):
-    """
-    Update a user partially.\n
-    Any null field of body won't be changed.
-    """
-    user = crud_service.patch(pk=user_id, update_schema=UserUpdate.from_orm(body))
+    user = crud_service.patch(pk=user_id, update_schema=UserUpdate(**body.dict()))
     return ResponseUser.model_validate(user)
 
 
-@router.put("/{user_id}", status_code=200, response_model=ResponseUser)
+@router.put("/{user_id}", response_model=ResponseUser)
 def put_user(
     body: RequestUserUpdate,
     user_id: str = Path(..., description="User ID"),
@@ -81,7 +68,7 @@ def put_user(
         crud_service_factory(entity.User, UserCreate, UserUpdate)
     ),
 ):
-    user = crud_service.put(pk=user_id, update_schema=UserUpdate.from_orm(body))
+    user = crud_service.put(pk=user_id, update_schema=UserUpdate(**body.dict()))
     return ResponseUser.model_validate(user)
 
 

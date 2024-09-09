@@ -1,7 +1,12 @@
-from pydantic import BaseModel
-
-from app.adapter.incoming.web.schema.response.base import PaginationMixin
+from app.adapter.incoming.web.schema.response.base import BaseModel, PaginationMixin
 from app.adapter.incoming.web.schema.response.user import ResponseUser
+
+
+class ResponsePostComment(BaseModel):
+    id: int
+    content: str
+
+    author: ResponseUser
 
 
 class ResponsePost(BaseModel):
@@ -10,13 +15,12 @@ class ResponsePost(BaseModel):
     content: str | None = None
 
     author: ResponseUser
-
-    class Config:
-        from_attributes = True
+    comments: list[ResponsePostComment] = []
 
 
 class ResponsePostList(PaginationMixin, BaseModel):
     items: list[ResponsePost]
 
-    class Config:
-        from_attributes = True
+
+class ResponsePostCommentList(PaginationMixin, BaseModel):
+    items: list[ResponsePostComment]

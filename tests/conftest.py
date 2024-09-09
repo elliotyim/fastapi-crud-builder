@@ -5,7 +5,7 @@ from collections.abc import Generator
 import pytest
 from app.config import ROOT_PATH
 from app.dependency.db import get_db, get_session_maker
-from app.domain.entity import Base, Post, User
+from app.domain.entity import Base, Post, PostComment, User
 from app.main import create_app
 from fastapi import FastAPI
 from sqlalchemy import create_engine
@@ -78,3 +78,18 @@ def dummy_posts(test_db: Session, dummy_users: list[User]) -> list[Post]:
     test_db.add_all(posts)
     test_db.commit()
     return posts
+
+
+@pytest.fixture
+def dummy_comments(test_db: Session, dummy_users: list[User], dummy_posts: list[Post]):
+    comments = [
+        PostComment(author=dummy_users[0], post=dummy_posts[0], content="comment0"),
+        PostComment(author=dummy_users[0], post=dummy_posts[1], content="comment1"),
+        PostComment(author=dummy_users[0], post=dummy_posts[2], content="comment2"),
+        PostComment(author=dummy_users[1], post=dummy_posts[1], content="comment3"),
+        PostComment(author=dummy_users[1], post=dummy_posts[2], content="comment4"),
+        PostComment(author=dummy_users[2], post=dummy_posts[0], content="comment5"),
+    ]
+    test_db.add_all(comments)
+    test_db.commit()
+    return comments

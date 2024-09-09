@@ -13,8 +13,7 @@ DB_PATH = os.path.join(ROOT_PATH, "db.sqlite3")
 @cache
 def get_engine() -> Engine:
     engine = create_engine(
-        url=f"sqlite:///{DB_PATH}",
-        connect_args={"check_same_thread": False}
+        url=f"sqlite:///{DB_PATH}", connect_args={"check_same_thread": False}, echo=True
     )
     return engine
 

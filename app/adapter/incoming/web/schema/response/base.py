@@ -1,4 +1,9 @@
-from pydantic import BaseModel
+from pydantic import BaseModel as PydanticBaseModel
+
+
+class BaseModel(PydanticBaseModel):
+    class Config:
+        from_attributes = True
 
 
 class PaginationMixin(BaseModel):
@@ -6,6 +11,3 @@ class PaginationMixin(BaseModel):
     total_page: int
     prev_page: int | None = None
     next_page: int | None = None
-
-    class Config:
-        from_attributes = True

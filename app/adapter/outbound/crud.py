@@ -102,13 +102,25 @@ class GenericCRUDRepositoryAdapter(CRUDRepositoryPort[K, T, C, U]):
         return query
 
     def _eager_load(self, query: Select, eager_loading_fields: list[str]) -> Select:
-        # TODO: Implement eager loading for all nested fields
         if eager_loading_fields:
-            joined_fields = [
-                joinedload(getattr(self._entity, field))
-                for field in eager_loading_fields
-            ]
-            query = query.options(*joined_fields)
+            options = []
+
+            for field in eager_loading_fields:
+                fields = self._extract_fields(field)
+
+                target = None
+                for field in fields:
+                    if target is None:
+                        target = joinedload(field)
+                    else:
+                        target = target.joinedload(field)
+
+                if target is not None:
+                    options.append(target)
+
+            for option in options:
+                query = query.options(option)
+
         return query
 
     def _execute(self, query: Select, page: int, per_page: int) -> PaginatedList:
