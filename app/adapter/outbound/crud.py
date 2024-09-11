@@ -125,7 +125,7 @@ class GenericCRUDRepositoryAdapter(CRUDRepositoryPort[K, T, C, U]):
 
     def _execute(self, query: Select, page: int, per_page: int) -> PaginatedList:
         total = self._db.execute(
-            select(func.count()).select_from(query.subquery())
+            select(func.count()).select_from(query.order_by(None).subquery())
         ).scalar()
         total_page = total // per_page + (1 if total % per_page else 0)
         prev_page = page - 1 if page > 1 else None
